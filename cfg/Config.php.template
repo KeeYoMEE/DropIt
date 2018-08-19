@@ -1,0 +1,56 @@
+<?php
+
+namespace Dt\Cfg;
+
+class Config
+{
+	private $config = [
+		'site' => [
+            'siteName' => 'DropIT',
+		],
+		'db' => [
+			'database_type' => 'mysql',
+			'database_name' => 'test',
+			'server' => 'localhost',
+			'username' => 'newuser',
+			'password' => 'password',
+            'logging' => true,
+		],
+		'general' => [
+			'cookie_lifetime' => 100, //days
+
+		],
+		'debug' => [
+            'errors' => true,
+            'deepErrors' => true,
+            'args' => false,
+            'log-env-notice' => false,
+            'log-env-err' => false,
+            'log-db-all' => false,
+            'log-db-err' => true,
+
+		]
+	];
+
+	public function __construct()
+	{
+		include_once 'defs.php';
+		return $this;
+	}
+
+	public function getAll()
+	{
+		return $this->config;
+	}
+
+	public function getByContext($context)
+	{
+		return isset($this->config[$context]) ? $this->config[$context] : false;
+	}
+
+	public function getByName($context, $name)
+	{
+		return isset($this->config[$context][$name]) ? $this->config[$context][$name] : false;
+	}
+
+}

@@ -1,0 +1,35 @@
+<div class="row">
+    <button class="red-btn form-control col-2"
+            id="home-button" onclick="clearNote()">CLEAR
+    </button>
+    <button class="red-btn form-control col-5"
+            id="home-button"
+            onclick="sendNote()">SAVE
+    </button>
+    <div class="btn-group col-4" style=" margin-top: 7px; height: 30px;">
+        <button class="btn btn-sm btn-outline-secondary thicc" onclick="setPinned();" id="home-pin">Pin</button>
+        <button class="btn btn-sm btn-outline-secondary thicc" onclick="setExported()" id="home-export">Export</button>
+        <button class="btn btn-sm btn-outline-secondary thicc" onclick="setArchived();" id="home-archive">Archive
+        </button>
+        <button class="btn btn-sm btn-outline-secondary thicc" onclick="setEncrypted();" id="home-encrypt">Encrypt
+        </button>
+        <button class="btn btn-sm btn-outline-secondary thicc" onclick="setDecrypted();" id="home-decrypt">Decrypt
+        </button>
+
+    </div>
+</div>
+
+<div class="row">
+    <textarea placeholder="Name" class="form-control" style="overflow-y: hidden; width: 100%; height: 40px"
+              id="home-name"></textarea>
+</div>
+<div class="row">
+    <textarea placeholder="Hashtags" class="form-control home-param" style="  width: 100%; height: 40px"
+              id="home-hashtags"></textarea><br>
+</div>
+<div class="row d-none d-md-block ">
+    <textarea style="height: calc(100vh - 250px);" class="form-control" id="home-text"></textarea>
+    <input type="text" hidden id="home-id">
+</div>
+
+

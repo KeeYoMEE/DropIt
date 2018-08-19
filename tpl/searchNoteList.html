@@ -1,0 +1,17 @@
+<loop.lines>
+
+    <div class="card" draggable="true" ondragstart="getNote({{ lines.id }})">
+        <div class="card-header row" id="heading{{ lines.id }}" data-toggle="collapse"
+             data-target="#collapse{{ lines.id }}" aria-controls="collapse{{ lines.id }}">
+            <div class="col-5">{{ lines.name }}</div>
+            <div class="col-7">{{ lines.hashtags }}</div>
+        </div>
+
+        <div id="collapse{{ lines.id }}" class="collapse " aria-labelledby="heading{{ lines.id }}">
+            <div class="card-body">
+                {{ lines.content }}
+            </div>
+        </div>
+    </div>
+
+</loop.lines>
