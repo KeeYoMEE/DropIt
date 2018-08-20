@@ -12,3 +12,14 @@ define('DIR_INC', DIR_ROOT . '/inc');
 define('DIR_LIB', DIR_ROOT . '/lib');
 define('DIR_TPL', DIR_ROOT . '/tpl');
 define('DIR_TMP', DIR_ROOT . '/tmp');
+
+
+define('NOT_FOUND', 404);
+define('OK', 200);
+define('FORBIDDEN', 403);
+define('BAD_REQUEST', 400);
+define('KO', 400);
+define('NO_CONTENT', 204);
+define('CONFLICT', 409);
+define('NOT_ACCEPTABLE', 406);
+

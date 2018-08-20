@@ -19,19 +19,19 @@ class SearchApi extends Api
     {
         if (isset($this->args['api'])) {
             switch ($this->args['api']) {
-                case 'getnotesbyhashtag':
+                case 'getNotesByHashtag':
                     $this->getNotesListByHashtag();
                     break;
-                case 'getallhashtags':
+                case 'getAllHashtags':
                     $this->getAllHashtagsList();
                     break;
-                case 'getallnotes':
+                case 'getAllNotes':
                     $this->getAllNotesList();
                     break;
-                case 'getnotesbyfulltext':
+                case 'getNotesByFulltext':
                     $this->getFulltextList();
                     break;
-                case 'getnotesbyname':
+                case 'getNotesByName':
                     $this->getNotesListByName();
                     break;
                 default:
@@ -44,25 +44,28 @@ class SearchApi extends Api
     {
         $this->json = true;
         $noteClass = new Note($this->env);
-        if (isset($this->args['json_string'])) {
-            $search = json_decode($this->args['json_string'], true)['whatIWant'];
-            if (!empty($search)) {
-                if ($notes = $noteClass->getNotesByHashtags($search)) {
+        if (isset($this->args['j_data']) || true) {
+            //$search = json_decode($this->args['j_data'], true);
+            $search['whatIWant'] = 'cool';
+            if (isset($search['whatIWant']) && !empty($search['whatIWant'])) {
+
+                $notes = $noteClass->getNotesByHashtags($search['whatIWant']);
+                if (is_array($notes) && !empty($notes)) {
                     foreach ($notes as $note) {
                         $data[] = $noteClass->getNote($note);
                     }
+                    if (!isset($data)) {
+                        $this->response = NOT_FOUND;
+                        return;
+                    }
                     $args = array('loop' => ['lines' => $data]);
+
                     $this->output = array('content' => getTemplated('searchNoteList', $args, true));
-                    $this->response('OK');
-                } else {
-                    $this->response('NOT FOUND');
-                }
-            } else {
-                $this->response('KO');
-            }
-        } else {
-            $this->response('KO');
-        }
+                    $this->response = OK;
+
+                } else $this->response = NOT_FOUND;
+            } else $this->response = NOT_ACCEPTABLE;
+        } else $this->response = NOT_ACCEPTABLE;
     }
 
     public function getAllHashtagsList()
@@ -72,71 +75,69 @@ class SearchApi extends Api
         $hashtags = $noteClass->getAllHashtags();
         $args = array('loop' => ['lines' => $hashtags]);
         if ($this->output = array('content' => getTemplated('searchHashtagsList', $args, true))) {
-            $this->response('OK');
-        } else {
-            $this->response('KO');
-        }
+
+            $this->response = OK;
+
+        } else $this->response = KO;
     }
 
     public function getAllNotesList()
     {
         $this->json = true;
         $noteClass = new Note($this->env);
-        if ($notes = $noteClass->getAllNotes()) {
+        $notes = $noteClass->getAllNotes();
+        if ($notes) {
             $args = array('loop' => ['lines' => $notes]);
-            if ($this->output = array('content' => getTemplated('searchNoteList', $args, true))) {
-                $this->response('OK');
-            } else {
-                $this->response('KO');
-            }
-        } else {
-            $this->response('NOT FOUND');
-        }
+
+            $this->output = array('content' => getTemplated('searchNoteList', $args, true));
+            $this->response = !empty($this->output) ? OK : KO;
+
+        } else $this->response = NOT_FOUND;
     }
 
     public function getFulltextList()
     {
         $this->json = true;
         $noteClass = new Note($this->env);
-        if (isset($this->args['json_string'])) {
-            $search = json_decode($this->args['json_string'], true)['whatIWant'];
-            if (!empty($search)) {
-                if ($notes = $noteClass->getNotesByFulltext($search)) {
+        if (isset($this->args['j_data'])) {
+            $search = json_decode($this->args['j_data'], true);
+            if (isset($search['whatIWant']) && !empty($search['whatIWant'])) {
+
+                $notes = $noteClass->getNotesByFulltext($search['whatIWant']);
+                if ($notes) {
                     foreach ($notes['ids'] as $id) {
                         $data[] = $noteClass->getNote($id);
                     }
-                    if (isset($data)) {
-                        $args = array('loop' => ['lines' => $data]);
-                        $this->output = array('content' => getTemplated('searchNoteList', $args, true));
-                        $this->response('OK');
-                    } else $this->response('NOT FOUND');
-                } else $this->response('NOT FOUND');
-            } else $this->response('KO');
-        } else $this->response('KO');
+                    $args = array('loop' => ['lines' => $data]);
+
+                    $this->output = array('content' => getTemplated('searchNoteList', $args, true));
+                    $this->response = OK;
+
+                } else $this->response = NOT_FOUND;
+            } else $this->response = NOT_ACCEPTABLE;
+        } else $this->response = NOT_ACCEPTABLE;
     }
 
     public function getNotesListByName()
     {
         $this->json = true;
         $noteClass = new Note($this->env);
-        if (isset($this->args['json_string'])) {
-            $search = json_decode($this->args['json_string'], true)['whatIWant'];
+        if (isset($this->args['j_data'])) {
+            $search = json_decode($this->args['j_data'], true)['whatIWant'];
             if (!empty($search)) {
-                if ($notes = $noteClass->getNotesByName($search)) {
+
+                $notes = $noteClass->getNotesByName($search);
+                if ($notes) {
                     foreach ($notes as $note) {
                         $data[] = $noteClass->getNote($note);
                     }
                     $args = array('loop' => ['lines' => $data]);
+
                     $this->output = array('content' => getTemplated('searchNoteList', $args, true));
-                    $this->response('OK');
-                } else {
-                    $this->response('NOT FOUND');
-                }
-            } else {
-                $this->response('KO');
-            }
-        } else {
-            $this->response('KO');
-        }
+                    $this->response = OK;
+
+                } else $this->response = NOT_FOUND;
+            } else $this->response = NOT_ACCEPTABLE;
+        } else $this->response = NOT_ACCEPTABLE;
     }
 }

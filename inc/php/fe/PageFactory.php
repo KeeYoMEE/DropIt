@@ -31,10 +31,10 @@ class PageFactory
             case 'register':
                 $page = new RegisterPage($this->env);
                 break;
-            case 'homeapi':
+            case 'homeApi':
                 $page = new HomeApi($this->env);
                 break;
-            case 'searchapi':
+            case 'searchApi':
                 $page = new SearchApi($this->env);
                 break;
 			default:

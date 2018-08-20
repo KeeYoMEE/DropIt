@@ -18,16 +18,16 @@ class HomeApi extends Api
     {
         if (isset($this->args['api'])) {
             switch ($this->args['api']) {
-                case 'getnote':
+                case 'getNote':
                     $this->getNote();
                     break;
-                case 'setnote':
+                case 'setNote':
                     $this->setNote();
                     break;
-                case 'setpinned':
+                case 'setPinned':
                     $this->setPinned();
                     break;
-                case 'setarchived':
+                case 'setArchived':
                     $this->setArchived();
                     break;
                 default:
@@ -42,15 +42,20 @@ class HomeApi extends Api
         $note = new Note($this->env);
         if (isset($this->args['id'])) {
             $this->output = $note->getNote($this->args['id']);
-            $note->tapNote($this->args['id']);
-        } else {
-            $this->output = array(
-                'hashtags' => 'NULL',
-                'name' => 'NULL',
-                'content' => 'NULL',
-                'id' => 0,
-            );
+            if ($this->output) {
+                $note->tapNote($this->args['id']);
+                $this->response = OK;
+                return;
+            }
         }
+        $this->output = array(
+            'hashtags' => 'NULL',
+            'name' => 'NULL',
+            'content' => 'NULL',
+            'id' => 0,
+        );
+        $this->response = NOT_FOUND;
+
     }
 
     public function setPinned()
@@ -60,14 +65,12 @@ class HomeApi extends Api
         if (isset($this->args['id']) && !empty($this->args['id'])) {
             if ($note->setPinned($this->args['id'])) {
                 $pinned = $this->db->select('home_notes', ['pinned'], ['id' => $this->args['id'], 'created_by' => $this->env->user->getId()]);
+
                 $this->output = array('pinned' => $pinned[0]['pinned']);
-                $this->response('OK');
-            } else {
-                $this->response('KO');
-            }
-        } else {
-            $this->response('KO');
-        }
+                $this->response = OK;
+
+            } else $this->response = KO;
+        } else $this->response = NOT_ACCEPTABLE;
     }
 
     public function setArchived()
@@ -77,32 +80,31 @@ class HomeApi extends Api
         if (isset($this->args['id']) && !empty($this->args['id'])) {
             if ($note->setArchived($this->args['id'])) {
                 $pinned = $this->db->select('home_notes', ['archived'], ['id' => $this->args['id'], 'created_by' => $this->env->user->getId()]);
+
                 $this->output = array('archived' => $pinned[0]['archived']);
-                $this->response('OK');
-            } else {
-                $this->response('KO');
-            }
-        } else {
-            $this->response('KO');
-        }
+                $this->response = OK;
+
+            } else $this->response = KO;
+        } else $this->response = NOT_ACCEPTABLE;
     }
 
     public function setNote()
     {
-        $this->json = true;
         $note = new Note($this->env);
-        if (isset($this->args['json_string'])) {
-            $data = json_decode($this->args['json_string'], true);
+        if (isset($this->args['j_data'])) {
+            $data = json_decode($this->args['j_data'], true);
             if ($note->setNote($data['name'], $data['content'], $data['hashtags'], $data['id'])) {
                 if ($tnt = $this->env->getTool('tntsearch')) {
                     $indexer = $tnt->createIndex($this->env->user->getId() . 'note.index');
                     $indexer->query('SELECT id, content FROM home_notes WHERE archived = 0 AND created_by = ' . $this->env->user->getId() . ';');
                     $indexer->run();
                 }
-                $this->response('OK');
-                return;
-            }
-        }
-        $this->response('KO');
+
+                $this->header = 'empty'; //returns nothing (to not to trigger NO_CONTENT)
+                $this->response = OK;
+
+            } else $this->response = KO;
+        } else $this->response = NOT_ACCEPTABLE;
+
     }
 }

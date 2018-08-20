@@ -42,12 +42,7 @@ class Note
             $arr = array_merge(array('hashtags' => $this->getHashtagsByNote($id, true)), $arr[0]);
             return $arr;
         }
-        return array(
-            'hashtags' => 'NULL',
-            'name' => 'NULL',
-            'content' => 'NULL',
-            'id' => 0,
-        );
+        return false;
     }
 
     public function tapNote($id)
@@ -133,7 +128,7 @@ class Note
     public function getHashtagsByNote($id, $string = false)
     {
         $hashtags = normalizeOneList($this->db->query("
-SELECT h.name 
+SELECT DISTINCT h.name 
 FROM home_hashtags h 
 INNER JOIN home_notes_to_hashtags nh 
   ON nh.id_hashtags = h.id 
@@ -244,7 +239,6 @@ WHERE h.id IN ('$id') AND n.created_by = " . $this->env->user->getId())->fetchAl
 
     public function getNotesByHashtags($word = '', $like = true)
     {
-        //TODO: upravit pro usera
         if (empty($word)) {
             $data = $this->db->select('home_hashtags', ['id', 'name']);
         } else if ($like) {
@@ -264,7 +258,7 @@ WHERE h.id IN ('$id') AND n.created_by = " . $this->env->user->getId())->fetchAl
     public function getAllHashtags()
     {
         $hashtags = $this->db->query("
-SELECT h.name 
+SELECT DISTINCT h.name 
 FROM home_hashtags h 
 INNER JOIN home_notes_to_hashtags nh 
   ON nh.id_hashtags = h.id 
@@ -296,10 +290,12 @@ WHERE n.created_by IN ('" . $this->env->user->getId() . "')")->fetchAll();
 
             return $tnt->search($word);
         }
+        return false;
     }
 
     public function getNotesByName($word)
     {
-        return normalizeOneList($this->db->select('home_notes', ['id'], ['archived' => 0, 'name[~]' => strtolower($word), 'created_by' => $this->env->user->getId()]), 'id');
+        $data = $this->db->select('home_notes', ['id'], ['archived' => 0, 'name[~]' => strtolower($word), 'created_by' => $this->env->user->getId()]);
+        return $data ? normalizeOneList($data, 'id') : false;
     }
 }

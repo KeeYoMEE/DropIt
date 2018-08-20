@@ -61,7 +61,7 @@ class User
         $session = isset($this->env->args['userSession']) ? true : false;
         if ($session) {
 
-            $sess = normalizeRow($this->db->select('users', ['session', 'id'], ['session' => $this->session]));
+            $sess = normalizeRow($this->db->select('users', ['session', 'id'], ['session' => $this->env->args['userSession']]));
             if (empty($sess)) {
                 return false;
             } else {
